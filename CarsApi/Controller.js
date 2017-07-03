@@ -10,8 +10,7 @@ exports.listAll = function (request, response) {
 
 
 exports.create = function (request, response) {
-    var car = new Model(request.body);
-    Model.save(function(error, car) {
+    Model.save(request.body, function(error, car) {
         if (error) {
             response.send(error);
         } else {
