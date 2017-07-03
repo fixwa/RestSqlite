@@ -28,21 +28,22 @@ exports.findById = function (request, response) {
     });
 };
 
-exports.update_a_task = function (request, response) {
-    // Task.findOneAndUpdate({_id:request.params.taskId}, request.body, {new: true}, function(error, task) {
-    //     if (error)
-    //         response.send(error);
-    //     response.json(task);
-    // });
+exports.update = function (request, response) {
+    Model.findOneAndUpdate(request.params.id, request.body, function(error, car) {
+        if (error) {
+            response.send(error);
+        } else {
+            response.json(car);
+        }
+    });
 };
-// Task.remove({}).exec(function(){});
-exports.delete_a_task = function (request, response) {
 
-    // Task.remove({
-    //     _id: request.params.taskId
-    // }, function(error, task) {
-    //     if (error)
-    //         response.send(error);
-    //     response.json({ message: 'Task successfully deleted' });
-    // });
+exports.delete = function (request, response) {
+    Model.delete(request.params.id, function(error, car) {
+        if (error) {
+            response.send(error);
+        } else {
+            response.json({ message: 'Successfully deleted: ' + request.params.id });
+        }
+    });
 };

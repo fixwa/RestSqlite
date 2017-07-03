@@ -10,6 +10,6 @@ module.exports = function(app) {
 
     app.route('/cars/:id')
         .get(controller.findById)
-        .put(controller.update_a_task)
-        .delete(controller.delete_a_task);
+        .put(controller.update)
+        .delete(controller.delete);
 };
