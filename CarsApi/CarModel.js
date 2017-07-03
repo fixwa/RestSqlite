@@ -27,7 +27,7 @@ var Model = {
     },
     findById: function (id, callback) {
         this.connect();
-        var stmt = this.db.prepare("SELECT * FROM cars WHERE rowid = ?");
+        var stmt = this.db.prepare("SELECT rowid AS id, * FROM cars WHERE rowid = ?");
         stmt.bind(id);
         stmt.get(function (error, row) {
             if (error) {
@@ -41,11 +41,12 @@ var Model = {
                 }
             }
         });
+        stmt.finalize();
         this.db.close();
     },
     findAll: function (callback) {
         this.connect();
-        this.db.all("SELECT * FROM cars", function (error, rows) {
+        this.db.all("SELECT rowid AS id, * FROM cars", function (error, rows) {
             if (error) {
                 throw error;
             } else {
@@ -55,33 +56,45 @@ var Model = {
         this.db.close();
     },
     save: function (data, callback) {
-        this.connect();
-        var stmt = this.db.prepare("INSERT INTO cars VALUES (?, ?)");
+        var self = this;
+        self.connect();
+        var stmt = self.db.prepare("INSERT INTO cars VALUES (?, ?)");
         stmt.run(data.name, data.color, function (error) {
             if (error) {
                 throw error;
             } else {
                 console.warn("inserted id:", this.lastID);
-                data.id = this.lastID;
-                callback(null, data);
+                self.findById(this.lastID, function(err, record) {
+                    if (err) {
+                        throw err;
+                    } else {
+                        callback(null, record);
+                    }
+                });
             }
         });
         stmt.finalize();
-        this.db.close();
+        self.db.close();
     },
     findOneAndUpdate: function (id, data, callback) {
-        this.connect();
+        var self = this;
+        self.connect();
         var stmt = this.db.prepare("UPDATE cars SET name = ?, color = ? WHERE rowid = ?");
         stmt.run(data.name, data.color, id, function (error) {
             if (error) {
                 throw error;
             } else {
-                data.id = this.id;
-                callback(null, data);
+                self.findById(id, function(err, record) {
+                    if (err) {
+                        throw err;
+                    } else {
+                        callback(null, record);
+                    }
+                });
             }
         });
         stmt.finalize();
-        this.db.close();
+        self.db.close();
     },
     delete: function (id, callback) {
         this.connect();
